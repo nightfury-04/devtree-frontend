@@ -50,6 +50,14 @@ export default function LinkTreeView() {
     });
   };
 
+  const links: SocialNetwork[] = JSON.parse(user.links);
+
+  // Validaciones para habilitar o deshabilitar un link
+  // 1. La URL debe ser válida
+  // 2. Si se habilita, se agrega a la lista de links del usuario
+  // 3. Si se deshabilita, se elimina de la lista de links del usuario
+  // 4. Al habilitar, se le asigna un id secuencial (1, 2, 3, ...)
+  // 5. Al deshabilitar, los ids de los links restantes deben actualizarse para que sigan siendo secuenciales
   const handleEnableLink = (socialNetwork: string) => {
     const updatedLinks = devTreeLinks.map((link) => {
       if (link.name === socialNetwork) {
@@ -63,6 +71,50 @@ export default function LinkTreeView() {
     });
     setDevTreeLinks(updatedLinks);
 
+    let updatedItems: SocialNetwork[] = [];
+
+    const selectedSocialNetwork = updatedLinks.find(
+      (link) => link.name === socialNetwork
+    );
+    if (selectedSocialNetwork?.enabled) {
+      const id = links.filter((link) => link.id).length + 1;
+
+      if (links.some((link) => link.name === socialNetwork)) {
+        updatedItems = links.map((link) => {
+          if (link.name === socialNetwork) {
+            return { ...link, enabled: true, id };
+          } else {
+            return link;
+          }
+        });
+      } else {
+        const newItem = {
+          ...selectedSocialNetwork,
+          id,
+        };
+        updatedItems = [...links, newItem];
+      }
+    } else {
+      const indexToUpdate = links.findIndex(
+        (link) => link.name === socialNetwork
+      );
+      updatedItems = links.map((link) => {
+        if (link.name === socialNetwork) {
+          return { ...link, id: 0, enabled: false };
+        } else if (link.id > indexToUpdate && (indexToUpdate !== 0 && link.id === 1)) {
+          return {
+            ...link,
+            id: link.id - 1,
+          };
+        } else {
+          return link;
+        }
+      });
+    }
+
+    console.log(updatedItems);
+
+    // Almacenar en la base de datos
     queryClient.setQueryData(["user"], (prevData: User) => {
       return {
         ...prevData,
@@ -82,9 +134,11 @@ export default function LinkTreeView() {
         />
       ))}
       <button
-        className="bg-cyan-400 p-2 text-lg w-full uppercase text-slate-600 rounded font-bold"
-        onClick={() => mutate()}
-      ></button>
+        className="bg-cyan-400 p-2 text-lg w-full uppercase text-slate-600 rounded-lg font-bold"
+        onClick={() => mutate(queryClient.getQueryData(["user"])!)}
+      >
+        Guardar Cambios
+      </button>
     </div>
   );
 }
