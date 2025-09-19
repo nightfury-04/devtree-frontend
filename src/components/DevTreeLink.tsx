@@ -1,7 +1,6 @@
 import type { SocialNetwork } from "../types";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { SocialNetwork } from "../types";
 
 type DevTreeLinkProps = {
   link: SocialNetwork;
