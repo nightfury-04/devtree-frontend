@@ -7,7 +7,7 @@ type DevTreeLinkProps = {
 };
 
 export default function DevTreeLink({ link }: DevTreeLinkProps) {
-  const { attributes, listeners, setNodeRef, transform, transition } =
+  const { attributes, listeners, transform, transition } =
     useSortable({ id: link.id });
 
   const style = {
