@@ -4,7 +4,7 @@ export default function AdminNavigation() {
   const queryCLient = useQueryClient();
 
   const logout = () => {
-    localStorage.removeItem('AUTH_TOKEN');
+    localStorage.removeItem("AUTH_TOKEN");
     queryCLient.invalidateQueries({ queryKey: ["user"] });
   };
 
